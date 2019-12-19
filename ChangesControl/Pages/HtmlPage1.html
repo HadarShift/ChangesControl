@@ -36,10 +36,10 @@
                     columns: [
                         {
                             render: function (data, type, row, meta) {
-                                let dataCar = "data-carId='" + row.ID + "'";
+                                let dataChange = "data-ID='" + row.ID + "'";
 
-                                editBtn = "<button type='button' class = 'editBtn btn btn-success' " + dataCar + "> Edit </button>";
-                                viewBtn = "<button type='button' class = 'viewBtn btn btn-info' " + dataCar + "> View </button>";
+                                editBtn = "<button type='button' class = 'editBtn btn btn-success' " + dataChange + "> Edit </button>";
+                                viewBtn = "<button type='button' class = 'viewBtn btn btn-info' " + dataChange + "> View </button>";
                                 return editBtn + viewBtn
                             }
                         },
@@ -88,7 +88,7 @@
             $("#editDiv").show();
             row.className = 'selected';
             $("#editDiv :input").attr("disabled", "disabled"); // view mode: disable all controls in the form
-            populateFields(this.getAttribute('data-carId'));
+            populateFields(this.getAttribute('data-ID'));
         });
 
         // mark the selected row
@@ -103,8 +103,32 @@
             markSelected(this);
             $("#editDiv").show();
             $("#editDiv :input").prop("disabled", false); // edit mode: enable all controls in the form
-            populateFields(this.getAttribute('data-carId')); // fill the form fields according to the selected row
+            populateFields(this.getAttribute('data-ID')); // fill the form fields according to the selected row
         });
+
+        // fill the form fields
+        function populateFields(ChangeID) {
+            objectChange = getObject(ChangeID);
+            $("#Name").val(objectChange.Name);
+            $("#EmpNum").val(objectChange.EmployeeNum);
+            $("#date").val(objectChange.Date);
+            $("#file").val(objectChange.File);
+            $("#libary").val(objectChange.Libary);
+            $("#subject").val(objectChange.Subject);
+            $("#description").val(objectChange.Subject);
+            //$("#automatic").prop('checked', car.Automatic);
+            //$("#image").attr("src", "images/" + car.Image);
+
+        }
+
+        // get a car according to its Id
+        function getObject(id) {
+            for (i in Changes) {
+                if (Changes[i].ID == id)
+                    return Changes[i];
+            }
+            return null;
+        }
     </script>
 
 </head>
@@ -140,31 +164,33 @@
                 <form id="carForm">
                     <div class="form-group row">
                         <div class="form-group col-sm-3">
-                            <label for="manufacturer"><span class="red-star">★ </span>Manufacturer</label>
-                            <input type="text" class="form-control" id="manufacturer" placeholder="Enter the manufacturer name" required>
+                            <label for="manufacturer"><span class="red-star">★ </span>שם</label>
+                            <input type="text" class="form-control" id="Name" placeholder="Enter the manufacturer name" required>
                         </div>
 
 
                         <div class="form-group col-sm-3">
-                            <label for="model"><span class="red-star">★ </span>Model</label>
-                            <input type="text" class="form-control" id="model" placeholder="Enter the model name" required>
+                            <label for="model"><span class="red-star">★ </span>מספר עובד</label>
+                            <input type="text" class="form-control" id="EmpNum" placeholder="Enter the model name" required>
                         </div>
 
 
                         <div class="form-group col-sm-3">
-                            <label for="year"><span class="red-star">★ </span>Year</label>
-                            <select id="year" class="form-control" required>
-                                <option value="">Choose Year</option>
-                                <option value="2019">2019</option>
-                                <option value="2018">2018</option>
-                                <option value="2017">2017</option>
-                                <option value="2016">2016</option>
-                            </select>
+                            <label for="year"><span class="red-star">★ </span>תאריך</label>
+                            <input type="text" class="form-control" id="date" placeholder="Enter the model name" required>
+
+                                     <!--<select id="year" class="form-control" required>
+                                        <option value="">Choose Year</option>
+                                        <option value="2019">2019</option>
+                                        <option value="2018">2018</option>
+                                        <option value="2017">2017</option>
+                                        <option value="2016">2016</option>
+                                    </select>-->
                         </div>
 
                         <div class="form-group col-sm-3">
-                            <label for="price"><span class="red-star">★ </span>Price</label>
-                            <input type="number" class="form-control" id="price" placeholder="Enter the price" required />
+                            <label for="price"><span class="red-star">★ </span>קובץ</label>
+                            <input type="text" class="form-control" id="file" placeholder="Enter the price" required />
                         </div>
 
 
@@ -172,46 +198,33 @@
 
                     <div class="form-group row">
 
+                        <!--<div class="form-group col-sm-3">
+                            <label for="file"><span class="red-star">★ </span>קובץ</label>
+                            <input type="number" class="form-control" id="file" placeholder="Enter the price" required />
+                        </div>-->
 
                         <div class="form-group col-sm-3">
-                            <label for="color"><span class="red-star">★ </span>Color</label>
-                            <select class="form-control" id="color" required>
-                                <option value="">Choose Color</option>
-                                <option value="White"> White </option>
-                                <option value="Blue"> Blue </option>
-                                <option value="Black"> Black </option>
-                                <option value="Red"> Red </option>
-                                <option value="Grey"> Grey </option>
-                            </select>
+                            <label for="libary"><span class="red-star">★ </span>ספריה</label>
+                            <input type="text" class="form-control" id="libary" placeholder="Enter the price" required />
                         </div>
 
                         <div class="form-group col-sm-3">
-                            <label for="hand"><span class="red-star">★ </span>Hand</label>
-                            <select class="form-control" id="hand" required>
-                                <option value="">Choose Hand</option>
-                                <option value="1"> 1 </option>
-                                <option value="2"> 2 </option>
-                                <option value="3"> 3 </option>
-                                <option value="4"> 4 </option>
-                                <option value="5"> 5 </option>
-                            </select>
-                        </div>
+                            <label for="subject"><span class="red-star">★ </span>נושא?</label>
+                            <input type="text" class="form-control" id="subject" placeholder="Enter the price" required />
 
-                        <div class="form-group col-sm-3">
-                            <label for="automatic"><span class="red-star">★ </span>Automatic?</label>
-                            <input type="checkbox" class="form-control" id="automatic" checked />
+                            <!--<input type="checkbox" class="form-control" id="automatic" checked />-->
                         </div>
 
                     </div>
                     <div class="form-group row">
                         <div class="form-group col-sm-8">
-                            <label for="description">Description</label>
+                            <label for="description">תיאור</label>
                             <textarea rows="6" class="form-control" id="description" placeholder="Enter the description"></textarea>
                         </div>
 
-                        <div class="form-group col-sm-4">
+                        <!--<div class="form-group col-sm-4">
                             <img src="images/car.jpg" id="image" />
-                        </div>
+                        </div>-->
 
                     </div>
 
@@ -220,7 +233,6 @@
                 </form>
             </div>
 
-        </form>
     </div>
 </body>
 </html>
