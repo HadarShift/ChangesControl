@@ -1,0 +1,226 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css">
+    <script src="../Scripts/ajaxCallsStub.js"></script>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+
+    <script>
+        $(document).ready(function () {
+            ajaxCall("GET", "../api/changes", "", successCBChange, error);
+            $("#editDiv").hide();
+
+        });
+
+        function successCBChange(Changes) {
+            ChangesFiles = Changes; // keep the cars array in a global variable;
+            try {
+                tbl = $('#ChangesTable').DataTable({
+                    data: ChangesFiles,
+                    pageLength: 7,
+                    columns: [
+                        {
+                            render: function (data, type, row, meta) {
+                                let dataCar = "data-carId='" + row.ID + "'";
+
+                                editBtn = "<button type='button' class = 'editBtn btn btn-success' " + dataCar + "> Edit </button>";
+                                viewBtn = "<button type='button' class = 'viewBtn btn btn-info' " + dataCar + "> View </button>";
+                                return editBtn + viewBtn
+                            }
+                        },
+
+                        { data: "ID" },
+                        { data: "Name" },
+                        { data: "EmployeeNum" },
+                        { data: "Date" },
+                        { data: "File" },
+                        { data: "Libary" },
+                        { data: "Subject" },
+                        //{
+                        //    data: "Automatic",
+                        //    render: function (data, type, row, meta) {
+                        //        if (data == true)
+                        //            return '<input type="checkbox" checked disabled="disabled" />';
+                        //        else
+                        //            return '<input type="checkbox" disabled="disabled"/>';
+                        //    }
+                        //},
+                        //{
+                        //    data: "Description",
+                        //    visible: false
+                        //},
+                        //{
+                        //    data: "Image",
+                        //    visible: false
+                        //}
+                    ],
+                });
+                //buttonEvents();
+            }
+
+            catch (err) {
+                alert(err);
+            }
+        }
+
+        function error(err) {
+            swal("Error: " + err);
+        }
+
+
+        $(document).on("click", ".viewBtn", function () {
+            markSelected(this);
+            $("#editDiv").show();
+            row.className = 'selected';
+            $("#editDiv :input").attr("disabled", "disabled"); // view mode: disable all controls in the form
+            populateFields(this.getAttribute('data-carId'));
+        });
+
+        // mark the selected row
+        function markSelected(btn) {
+            $("#ChangesTable tr").removeClass("selected"); // remove seleced class from rows that were selected before
+            row = (btn.parentNode).parentNode; // button is in TD which is in Row
+            row.className = 'selected'; // mark as selected
+        }
+
+        //edit button-relase all inputs
+        $(document).on("click", ".editBtn", function () {
+            markSelected(this);
+            $("#editDiv").show();
+            $("#editDiv :input").prop("disabled", false); // edit mode: enable all controls in the form
+            populateFields(this.getAttribute('data-carId')); // fill the form fields according to the selected row
+        });
+    </script>
+
+</head>
+<body>
+
+    <nav class="navbar navbar-default" >
+        <div class="container-fluid">
+            <div class="navbar-header" >
+                <a class="navbar-brand" href="#" >ניהול שינויים</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <form id="pForm">
+            <table id="ChangesTable" class="display nowrap" style="width:100%">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th>Initated by</th>
+                        <th>EmployeeNum</th>
+                        <th>Date</th>
+                        <th>File</th>
+                        <th>Libary</th>
+                        <th>Subject</th>
+                    </tr>
+                </thead>
+            </table>
+       </form>
+
+            <div id="editDiv">
+                <form id="carForm">
+                    <div class="form-group row">
+                        <div class="form-group col-sm-3">
+                            <label for="manufacturer"><span class="red-star">★ </span>Manufacturer</label>
+                            <input type="text" class="form-control" id="manufacturer" placeholder="Enter the manufacturer name" required>
+                        </div>
+
+
+                        <div class="form-group col-sm-3">
+                            <label for="model"><span class="red-star">★ </span>Model</label>
+                            <input type="text" class="form-control" id="model" placeholder="Enter the model name" required>
+                        </div>
+
+
+                        <div class="form-group col-sm-3">
+                            <label for="year"><span class="red-star">★ </span>Year</label>
+                            <select id="year" class="form-control" required>
+                                <option value="">Choose Year</option>
+                                <option value="2019">2019</option>
+                                <option value="2018">2018</option>
+                                <option value="2017">2017</option>
+                                <option value="2016">2016</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-sm-3">
+                            <label for="price"><span class="red-star">★ </span>Price</label>
+                            <input type="number" class="form-control" id="price" placeholder="Enter the price" required />
+                        </div>
+
+
+                    </div>
+
+                    <div class="form-group row">
+
+
+                        <div class="form-group col-sm-3">
+                            <label for="color"><span class="red-star">★ </span>Color</label>
+                            <select class="form-control" id="color" required>
+                                <option value="">Choose Color</option>
+                                <option value="White"> White </option>
+                                <option value="Blue"> Blue </option>
+                                <option value="Black"> Black </option>
+                                <option value="Red"> Red </option>
+                                <option value="Grey"> Grey </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-sm-3">
+                            <label for="hand"><span class="red-star">★ </span>Hand</label>
+                            <select class="form-control" id="hand" required>
+                                <option value="">Choose Hand</option>
+                                <option value="1"> 1 </option>
+                                <option value="2"> 2 </option>
+                                <option value="3"> 3 </option>
+                                <option value="4"> 4 </option>
+                                <option value="5"> 5 </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-sm-3">
+                            <label for="automatic"><span class="red-star">★ </span>Automatic?</label>
+                            <input type="checkbox" class="form-control" id="automatic" checked />
+                        </div>
+
+                    </div>
+                    <div class="form-group row">
+                        <div class="form-group col-sm-8">
+                            <label for="description">Description</label>
+                            <textarea rows="6" class="form-control" id="description" placeholder="Enter the description"></textarea>
+                        </div>
+
+                        <div class="form-group col-sm-4">
+                            <img src="images/car.jpg" id="image" />
+                        </div>
+
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg" id="saveBTN">Save</button>
+
+                </form>
+            </div>
+
+        </form>
+    </div>
+</body>
+</html>
