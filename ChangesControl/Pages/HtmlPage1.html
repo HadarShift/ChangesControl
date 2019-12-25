@@ -10,22 +10,40 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css">
-    <script src="../Scripts/ajaxCallsStub.js"></script>
-
+    <!--<script src="../Scripts/ajaxCallsStub.js"></script>-->
+    <script src="../Scripts/ajaxCalls.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
+    <style>
+        #newBTN {
+            background-color: orange;
+            margin-left: 120px;
+        }
+    </style>
+
 
 
     <script>
         $(document).ready(function () {
-            ajaxCall("GET", "../api/changes", "", successCBChange, error);
+
+            ajaxCall("GET", "../api/Changes", "", successCBChange, error);
             $("#editDiv").hide();
+            $("#ChangesForm").submit(function () {
+                event.preventDefault();
+                Save();
+            }
+            );
+            $("#newBTN").click(AddChange)
 
         });
+
+
 
         function successCBChange(Changes) {
             ChangesFiles = Changes; // keep the cars array in a global variable;
@@ -35,8 +53,8 @@
                     pageLength: 7,
                     columns: [
                         {
-                            render: function (data, type, row, meta) {
-                                let dataChange = "data-ID='" + row.ID + "'";
+                            render: function (data, type, row, meta) {//build for any row
+                                let dataChange = "data-ID='" + row.Id + "'";
 
                                 editBtn = "<button type='button' class = 'editBtn btn btn-success' " + dataChange + "> Edit </button>";
                                 viewBtn = "<button type='button' class = 'viewBtn btn btn-info' " + dataChange + "> View </button>";
@@ -44,13 +62,23 @@
                             }
                         },
 
-                        { data: "ID" },
+                        { data: "Id" },
                         { data: "Name" },
                         { data: "EmployeeNum" },
                         { data: "Date" },
                         { data: "File" },
                         { data: "Libary" },
                         { data: "Subject" },
+                        {
+                            data: "Approved",
+                            render: function (data, type, row, meta) {
+                                if (data)
+                                    ApprovedCb = "<button type='button' style='background-color: green'> V </button>"
+                                else
+                                    ApprovedCb = "<button type='button' style='background-color: red'> V </button>"
+                                return ApprovedCb
+                            }
+                        }
                         //{
                         //    data: "Automatic",
                         //    render: function (data, type, row, meta) {
@@ -115,7 +143,7 @@
             $("#file").val(objectChange.File);
             $("#libary").val(objectChange.Libary);
             $("#subject").val(objectChange.Subject);
-            $("#description").val(objectChange.Subject);
+            $("#description").val(objectChange.Description);
             //$("#automatic").prop('checked', car.Automatic);
             //$("#image").attr("src", "images/" + car.Image);
 
@@ -123,24 +151,84 @@
 
         // get a car according to its Id
         function getObject(id) {
-            for (i in Changes) {
-                if (Changes[i].ID == id)
-                    return Changes[i];
+            for (i in ChangesFiles) {
+                if (ChangesFiles[i].Id == id)
+                    return ChangesFiles[i];
             }
             return null;
+        }
+
+        function AddChange() {
+            ClearFields();
+            NewOrUpdate = "New";
+            $("#editDiv").show();
+
+        }
+        //add or update change on as400
+        function onSubmitFunc() {
+            return false;
+        }
+        function Save() {
+            if (NewOrUpdate == "New") {
+
+                var ChangeObj = {
+                    Name: $("#Name").val(),
+                    EmployeeNum: $("#EmpNum").val(),
+                    Date: $("#date").val(),
+                    File: $("#file").val(),
+                    Libary: $("#libary").val(),
+                    Subject: $("#subject").val(),
+                    Description: $("#description").val()
+                }
+                ajaxCall("POST", "../api/Changes", JSON.stringify(ChangeObj), postChangeSuccess, postChangeError);//insert change to db
+
+            }
+        }
+
+
+        function postChangeSuccess(massege) {
+            if (massege == "Success") {
+                swal("שינוי נוסף בהצלחה");
+                ajaxCall("GET", "../api/Changes", "", successCBChange, error);
+            }
+            else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'שגיאה',
+                    text: massege
+                    //footer: '<a href>Why do I have this issue?</a>'
+                })
+            }
+
+
+        }
+
+        function postChangeError(massege) {
+            alert("שגיאה");
+        }
+        function ClearFields() {
+            $("#Name").val('');
+            $("#EmpNum").val('');
+            $("#date").val('');
+            $("#file").val('');
+            $("#libary").val('');
+            $("#subject").val('');
+            $("#description").val('');
         }
     </script>
 
 </head>
 <body>
 
-    <nav class="navbar navbar-default" >
+    <nav class="navbar navbar-default">
         <div class="container-fluid">
-            <div class="navbar-header" >
-                <a class="navbar-brand" href="#" >ניהול שינויים</a>
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">ניהול שינויים</a>
             </div>
         </div>
     </nav>
+    <h1>Changes</h1>
+    <button type="button" class="btn btn-primary btn-lg" id="newBTN">הוסף שינוי חדש</button>
 
     <div class="container">
         <form id="pForm">
@@ -155,83 +243,85 @@
                         <th>File</th>
                         <th>Libary</th>
                         <th>Subject</th>
+                        <th>Approve</th>
                     </tr>
                 </thead>
             </table>
-       </form>
+        </form>
 
-            <div id="editDiv">
-                <form id="carForm">
-                    <div class="form-group row">
-                        <div class="form-group col-sm-3">
-                            <label for="manufacturer"><span class="red-star">★ </span>שם</label>
-                            <input type="text" class="form-control" id="Name" placeholder="Enter the manufacturer name" required>
-                        </div>
-
-
-                        <div class="form-group col-sm-3">
-                            <label for="model"><span class="red-star">★ </span>מספר עובד</label>
-                            <input type="text" class="form-control" id="EmpNum" placeholder="Enter the model name" required>
-                        </div>
-
-
-                        <div class="form-group col-sm-3">
-                            <label for="year"><span class="red-star">★ </span>תאריך</label>
-                            <input type="text" class="form-control" id="date" placeholder="Enter the model name" required>
-
-                                     <!--<select id="year" class="form-control" required>
-                                        <option value="">Choose Year</option>
-                                        <option value="2019">2019</option>
-                                        <option value="2018">2018</option>
-                                        <option value="2017">2017</option>
-                                        <option value="2016">2016</option>
-                                    </select>-->
-                        </div>
-
-                        <div class="form-group col-sm-3">
-                            <label for="price"><span class="red-star">★ </span>קובץ</label>
-                            <input type="text" class="form-control" id="file" placeholder="Enter the price" required />
-                        </div>
-
-
+        <div id="editDiv">
+            <form id="ChangesForm">
+                <div class="form-group row">
+                    <div class="form-group col-sm-3">
+                        <label for="manufacturer"><span class="red-star">★ </span>שם</label>
+                        <input type="text" class="form-control" id="Name" placeholder="Enter the manufacturer name" required>
                     </div>
 
-                    <div class="form-group row">
 
-                        <!--<div class="form-group col-sm-3">
-                            <label for="file"><span class="red-star">★ </span>קובץ</label>
-                            <input type="number" class="form-control" id="file" placeholder="Enter the price" required />
-                        </div>-->
-
-                        <div class="form-group col-sm-3">
-                            <label for="libary"><span class="red-star">★ </span>ספריה</label>
-                            <input type="text" class="form-control" id="libary" placeholder="Enter the price" required />
-                        </div>
-
-                        <div class="form-group col-sm-3">
-                            <label for="subject"><span class="red-star">★ </span>נושא?</label>
-                            <input type="text" class="form-control" id="subject" placeholder="Enter the price" required />
-
-                            <!--<input type="checkbox" class="form-control" id="automatic" checked />-->
-                        </div>
-
-                    </div>
-                    <div class="form-group row">
-                        <div class="form-group col-sm-8">
-                            <label for="description">תיאור</label>
-                            <textarea rows="6" class="form-control" id="description" placeholder="Enter the description"></textarea>
-                        </div>
-
-                        <!--<div class="form-group col-sm-4">
-                            <img src="images/car.jpg" id="image" />
-                        </div>-->
-
+                    <div class="form-group col-sm-3">
+                        <label for="model"><span class="red-star">★ </span>מספר עובד</label>
+                        <input type="text" class="form-control" id="EmpNum" placeholder="Enter the model name" required>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-lg" id="saveBTN">Save</button>
 
-                </form>
-            </div>
+                    <div class="form-group col-sm-3">
+                        <label for="year"><span class="red-star">★ </span>תאריך</label>
+                        <input type="text" class="form-control" id="date" placeholder="Enter the model name" required>
+
+                        <!--<select id="year" class="form-control" required>
+                            <option value="">Choose Year</option>
+                            <option value="2019">2019</option>
+                            <option value="2018">2018</option>
+                            <option value="2017">2017</option>
+                            <option value="2016">2016</option>
+                        </select>-->
+                    </div>
+
+                    <div class="form-group col-sm-3">
+                        <label for="price"><span class="red-star">★ </span>קובץ</label>
+                        <input type="text" class="form-control" id="file" placeholder="Enter the price" required />
+                    </div>
+
+
+                </div>
+
+                <div class="form-group row">
+
+                    <!--<div class="form-group col-sm-3">
+                        <label for="file"><span class="red-star">★ </span>קובץ</label>
+                        <input type="number" class="form-control" id="file" placeholder="Enter the price" required />
+                    </div>-->
+
+                    <div class="form-group col-sm-3">
+                        <label for="libary"><span class="red-star">★ </span>ספריה</label>
+                        <input type="text" class="form-control" id="libary" placeholder="Enter the price" required />
+                    </div>
+
+                    <div class="form-group col-sm-3">
+                        <label for="subject"><span class="red-star">★ </span>נושא?</label>
+                        <input type="text" class="form-control" id="subject" placeholder="Enter the price" required />
+
+                        <!--<input type="checkbox" class="form-control" id="automatic" checked />-->
+                    </div>
+
+                </div>
+                <div class="form-group row">
+                    <div class="form-group col-sm-8">
+                        <label for="description">תיאור</label>
+                        <textarea rows="6" class="form-control" id="description" placeholder="Enter the description"></textarea>
+                    </div>
+
+                    <!--<div class="form-group col-sm-4">
+                        <img src="images/car.jpg" id="image" />
+                    </div>-->
+
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg" id="saveBTN">Save</button>
+                <button type="submit" class="btn btn-primary btn-lg" id="cancelBTN">Cancel</button>
+
+            </form>
+        </div>
 
     </div>
 </body>
