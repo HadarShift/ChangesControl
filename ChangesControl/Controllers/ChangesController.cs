@@ -7,6 +7,9 @@ using System.Net.Http;
 using System.Web;
 using System.Web.Http;
 using ChangesControl.Models;
+using System.DirectoryServices;
+using System.DirectoryServices.AccountManagement;
+
 
 namespace ChangesControl.Controllers
 {
@@ -15,7 +18,18 @@ namespace ChangesControl.Controllers
         Changes changes = new Changes();        
         // GET api/values
         public DataTable Get()
-        {            
+        {
+            //check user authentication
+            string strAccountId = "hshiftan";
+            string strPassword = "Hs29571";
+            string Domain = System.DirectoryServices.ActiveDirectory.Domain.GetComputerDomain().ToString();
+
+
+            using (PrincipalContext pc = new PrincipalContext(ContextType.Domain, Domain))
+            {
+                // validate the credentials
+                bool isValid = pc.ValidateCredentials(strAccountId, strPassword);
+            }
             DataTable dataTable = new DataTable();
             dataTable=changes.GetFromDB();
             return dataTable;

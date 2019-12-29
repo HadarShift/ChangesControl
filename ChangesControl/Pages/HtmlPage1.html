@@ -25,14 +25,84 @@
             background-color: orange;
             margin-left: 120px;
         }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        form {
+            border: 3px solid #f1f1f1;
+        }
+
+        input[type=text], input[type=password] {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        #Login button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+            button:hover {
+                opacity: 0.8;
+            }
+
+        .cancelbtn {
+            width: auto;
+            padding: 10px 18px;
+            background-color: #f44336;
+        }
+
+        .imgcontainer {
+            text-align: center;
+            margin: 24px 0 12px 0;
+        }
+
+        img.avatar {
+            width: 40%;
+            /*border-radius: 50%;*/
+        }
+
+        .container {
+            padding: 16px;
+        }
+
+        span.psw {
+            float: right;
+            padding-top: 16px;
+        }
+
+        /* Change styles for span and cancel button on extra small screens */
+        @media screen and (max-width: 300px) {
+            span.psw {
+                display: block;
+                float: none;
+            }
+
+            .cancelbtn {
+                width: 100%;
+            }
+        }
+
     </style>
 
 
 
-    <script>
+    <script language="javascript">
         $(document).ready(function () {
-
+            
             ajaxCall("GET", "../api/Changes", "", successCBChange, error);
+            $("#bodyContainer").hide()
             $("#editDiv").hide();
             $("#ChangesForm").submit(function () {
                 event.preventDefault();
@@ -73,10 +143,13 @@
                             data: "Approved",
                             render: function (data, type, row, meta) {
                                 if (data)
-                                    ApprovedCb = "<button type='button' style='background-color: green'> V </button>"
+                                    ApprovedIt = "<button type='button' style='background-color: green'> IT MANAGER </button>"
                                 else
-                                    ApprovedCb = "<button type='button' style='background-color: red'> V </button>"
-                                return ApprovedCb
+                                    ApprovedIt = "<button type='button' style='background-color: red'> IT MANAGER </button>"
+
+                                ApprovedUser = "<button type='button' style='background-color: green'> USER </button>"
+                                AprrovedFinance = "<button type='button' style='background-color: green'> FINANCE </button>"
+                                return ApprovedIt + ApprovedUser + AprrovedFinance
                             }
                         }
                         //{
@@ -215,11 +288,77 @@
             $("#subject").val('');
             $("#description").val('');
         }
+
+
+        function edit_row(no) {
+            document.getElementById("edit_button" + no).style.display = "none";
+            document.getElementById("save_button" + no).style.display = "block";
+
+            var name = document.getElementById("name_row" + no);
+            var country = document.getElementById("country_row" + no);
+            var age = document.getElementById("age_row" + no);
+
+            var name_data = name.innerHTML;
+            var country_data = country.innerHTML;
+            var age_data = age.innerHTML;
+
+            name.innerHTML = "<input type='text' id='name_text" + no + "' value='" + name_data + "'>";
+            country.innerHTML = "<input type='text' id='country_text" + no + "' value='" + country_data + "'>";
+            age.innerHTML = "<input type='text' id='age_text" + no + "' value='" + age_data + "'>";
+        }
+
+        function save_row(no) {
+            var name_val = document.getElementById("name_text" + no).value;
+            var country_val = document.getElementById("country_text" + no).value;
+            var age_val = document.getElementById("age_text" + no).value;
+
+            document.getElementById("name_row" + no).innerHTML = name_val;
+            document.getElementById("country_row" + no).innerHTML = country_val;
+            document.getElementById("age_row" + no).innerHTML = age_val;
+
+            document.getElementById("edit_button" + no).style.display = "block";
+            document.getElementById("save_button" + no).style.display = "none";
+        }
+
+        function delete_row(no) {
+            document.getElementById("row" + no + "").outerHTML = "";
+        }
+        //ADD row for libary and Objects 
+        function add_row_updates() {
+            var new_libary = document.getElementById("new_libary").value;
+            var new_object = document.getElementById("new_object").value;
+            var new_comment = document.getElementById("new_comment").value;
+
+            var table = document.getElementById("data_table");
+            var table_len = (table.rows.length) - 1;
+            var row = table.insertRow(table_len).outerHTML = "<tr id='row" + table_len + "'><td id='name_row" + table_len + "'>" + new_libary + "</td><td id='country_row" + table_len + "'>" + new_object + "</td><td id='age_row" + table_len + "'>" + new_comment + "</td><td><input type='button' id='edit_button" + table_len + "' value='Edit' class='edit' onclick='edit_row(" + table_len + ")'> <input type='button' id='save_button" + table_len + "' value='Save' class='save' onclick='save_row(" + table_len + ")'> <input type='button' value='Delete' class='delete' onclick='delete_row(" + table_len + ")'></td></tr>";
+
+            document.getElementById("new_libary").value = "";
+            document.getElementById("new_object").value = "";
+            document.getElementById("new_comment").value = "";
+        }
+        //ADD row for testing 
+        function add_row_test() {
+            var No = document.getElementById("No").value;
+            var descTest = document.getElementById("descTest").value;
+            var SignUser = document.getElementById("SignUser").value;
+            var SignDeveloper = document.getElementById("SignDeveloper").value;
+
+            var table = document.getElementById("tableTestingPlan");
+            var table_len = (table.rows.length) - 1;
+            var row = table.insertRow(table_len).outerHTML = "<tr id='row" + table_len + "'><td id='name_row" + table_len + "'>" + No + "</td><td id='country_row" + table_len + "'>" + descTest + "</td><td id='age_row" + table_len + "'>" + SignUser + "</td><td><input type='button' id='edit_button" + table_len + "' value='Edit' class='edit' onclick='edit_row(" + table_len + ")'> <input type='button' id='save_button" + table_len + "' value='Save' class='save' onclick='save_row(" + table_len + ")'> <input type='button' value='Delete' class='delete' onclick='delete_row(" + table_len + ")'></td></tr>";
+
+            document.getElementById("No").value = table_len;
+            document.getElementById("descTest").value = "";
+            document.getElementById("SignUser").value = "";
+            document.getElementById("SignDeveloper").value = "";
+
+        }
+        
     </script>
 
 </head>
 <body>
-
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
@@ -227,10 +366,41 @@
             </div>
         </div>
     </nav>
-    <h1>Changes</h1>
-    <button type="button" class="btn btn-primary btn-lg" id="newBTN">הוסף שינוי חדש</button>
 
-    <div class="container">
+    <h2>Login Form</h2>
+
+    <!--login form-->
+    <form action="/action_page.php" method="post" id="Login">
+        <div class="imgcontainer">
+            <img src="splash.jpg" alt="Avatar" class="avatar">
+        </div>
+
+        <div class="container">
+            <label for="uname"><b>Username</b></label>
+            <input type="text" placeholder="Enter Username" name="uname" required>
+
+            <label for="psw"><b>Password</b></label>
+            <input type="password" placeholder="Enter Password" name="psw" required>
+
+            <button type="submit">Login</button>
+            <!--<label>
+                <input type="checkbox" checked="checked" name="remember"> Remember me
+            </label>-->
+        </div>
+
+        <div class="container" style="background-color:#f1f1f1">
+            <button type="button" class="cancelbtn">Cancel</button>
+            <span class="psw">Forgot <a href="#">password?</a></span>
+        </div>
+    </form>
+
+    <!--all body-->
+
+    <div class="container" id="bodyContainer">
+
+        <h1>Changes</h1>
+        <button type="button" class="btn btn-primary btn-lg" id="newBTN">הוסף שינוי חדש</button>
+
         <form id="pForm">
             <table id="ChangesTable" class="display nowrap" style="width:100%">
                 <thead>
@@ -253,20 +423,25 @@
             <form id="ChangesForm">
                 <div class="form-group row">
                     <div class="form-group col-sm-3">
-                        <label for="manufacturer"><span class="red-star">★ </span>שם</label>
-                        <input type="text" class="form-control" id="Name" placeholder="Enter the manufacturer name" required>
+                        <label for="manufacturer"><span class="red-star">★ </span>שם יזם</label>
+                        <input type="text" class="form-control" id="Name" placeholder="Enter the Initator name" required>
                     </div>
 
+                    <div class="form-group col-sm-3">
+                        <label for="manufacturer"><span class="red-star">★ </span>שם מפתח</label>
+                        <input type="text" class="form-control" id="NamePrgrammer" placeholder="Enter the Initator name" required>
+                    </div>
 
                     <div class="form-group col-sm-3">
                         <label for="model"><span class="red-star">★ </span>מספר עובד</label>
-                        <input type="text" class="form-control" id="EmpNum" placeholder="Enter the model name" required>
+                        <input type="text" class="form-control" id="EmpNum" placeholder="Enter Programmer number" required>
                     </div>
 
 
                     <div class="form-group col-sm-3">
                         <label for="year"><span class="red-star">★ </span>תאריך</label>
                         <input type="text" class="form-control" id="date" placeholder="Enter the model name" required>
+
 
                         <!--<select id="year" class="form-control" required>
                             <option value="">Choose Year</option>
@@ -277,9 +452,79 @@
                         </select>-->
                     </div>
 
+                </div>
+                <div class="form-group col-sm-3">
+                    <label for="subject"><span class="red-star">★ </span>נושא?</label>
+                    <input type="text" class="form-control" id="subject" placeholder="Enter the price" required />
+
+                    <!--<input type="checkbox" class="form-control" id="automatic" checked />-->
+                </div>
+
+                <div class="form-group row">
+                    <div class="form-group col-sm-8">
+                        <label for="description">תיאור</label>
+                        <textarea rows="6" class="form-control" id="description" placeholder="Enter the description"></textarea>
+                    </div>
+
+                    <!--<div class="form-group col-sm-4">
+                        <img src="images/car.jpg" id="image" />
+                    </div>-->
+
+                    <div class="form-group row">
+                        <div class="form-group col-sm-8">
+                            <h2>List of Objects that were created/updated</h2>
+                            <table align='center' cellspacing=2 cellpadding=5 id="data_table" border=1>
+                                <tr>
+                                    <th>Libary</th>
+                                    <th>Object</th>
+                                    <th>Comment</th>
+                                </tr>
+
+
+
+                                <tr>
+                                    <td><input type="text" id="new_libary"></td>
+                                    <td><input type="text" id="new_object"></td>
+                                    <td><input type="text" id="new_comment"></td>
+                                    <td><input type="button" class="add" onclick="add_row_updates();" value="הוסף שורה"></td>
+                                </tr>
+
+                            </table>
+                        </div>
+
+
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="form-group col-sm-8">
+                            <h2>Testing Plan</h2>
+                            <table align='center' cellspacing=2 cellpadding=5 id="tableTestingPlan" border=1>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Description of the test</th>
+                                    <th>User Signature</th>
+                                    <th>Developer Signature</th>
+                                </tr>
+
+
+
+                                <tr>
+                                    <td><input type="text" id="No"></td>
+                                    <td><input type="text" id="descTest"></td>
+                                    <td><button id="SignUser" class="center-block">User</button></td>
+                                    <td><button id="SignDeveloper" class="center-block">Developer</button></td>
+                                    <td><input type="button" class="add" onclick="add_row_test();" value="הוסף שורה"></td>
+                                </tr>
+
+                            </table>
+                        </div>
+
+
+                    </div>
+
                     <div class="form-group col-sm-3">
-                        <label for="price"><span class="red-star">★ </span>קובץ</label>
-                        <input type="text" class="form-control" id="file" placeholder="Enter the price" required />
+                        <label for="automatic"><span class="red-star">★ </span>נדרש אישור כספים?</label>
+                        <input type="checkbox" class="form-control" id="automatic" checked />
                     </div>
 
 
@@ -297,25 +542,9 @@
                         <input type="text" class="form-control" id="libary" placeholder="Enter the price" required />
                     </div>
 
-                    <div class="form-group col-sm-3">
-                        <label for="subject"><span class="red-star">★ </span>נושא?</label>
-                        <input type="text" class="form-control" id="subject" placeholder="Enter the price" required />
-
-                        <!--<input type="checkbox" class="form-control" id="automatic" checked />-->
-                    </div>
 
                 </div>
-                <div class="form-group row">
-                    <div class="form-group col-sm-8">
-                        <label for="description">תיאור</label>
-                        <textarea rows="6" class="form-control" id="description" placeholder="Enter the description"></textarea>
-                    </div>
 
-                    <!--<div class="form-group col-sm-4">
-                        <img src="images/car.jpg" id="image" />
-                    </div>-->
-
-                </div>
 
                 <button type="submit" class="btn btn-primary btn-lg" id="saveBTN">Save</button>
                 <button type="submit" class="btn btn-primary btn-lg" id="cancelBTN">Cancel</button>
