@@ -198,6 +198,9 @@
     <Compile Include="Models\Changes.cs" />
     <Compile Include="Models\DBservices.cs" />
     <Compile Include="Models\LogWave.cs" />
+    <Compile Include="Models\Objects.cs" />
+    <Compile Include="Models\Tests.cs" />
+    <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

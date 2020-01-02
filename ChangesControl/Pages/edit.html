@@ -37,9 +37,9 @@
         // will run when the document is ready
         $(document).ready(function () {
 
-            // once the document is ready we fetch a list of cars from the server
+            // once the document is ready we fetch a list of changes from the server
             ajaxCall("GET", "../api/cars", "", getSuccess, error);
-            
+            $("#")
             $("#carForm").submit(onSubmitFunc); // wire the submit event to a function called f1
             $("#editDiv").hide();
         });

@@ -9,18 +9,21 @@ namespace ChangesControl.Models
 {
     public class Changes
     {
-        public int ID { get; set; }
-        public int EmployeeNum { get; set; }
-        public string Name { get; set; }
+        public int Id { get; set; }
+        public string NameInitated { get; set; }
+        public string Programmer { get; set; }
+        public int ProgrammerNum { get; set; }
         public string Date { get; set; }
-        public string File { get; set; }
-        public string Libary { get; set; }
         public string Subject { get; set; }
         public string Description { get; set; }
-        public string AddedFile { get; set; }
-        public bool Approved { get; set; }
-
+        public bool ApprovedIt { get; set; }
+        public bool AprrovedInitated { get; set; }
+        public bool FinanceApproveNecessary { get; set; }
+        public bool ApprovedFinance { get; set; }
+        public List<Objects> ObjectsList { get; set; }
+        public List<Tests> TestsList { get; set; }
         DBservices dBservices = new DBservices();
+
         public Changes()
         {
 
@@ -30,7 +33,8 @@ namespace ChangesControl.Models
         {
             DataTable dataTable = new DataTable();
             string qry = $@"SELECT *
-                          FROM ChangesS400";
+                          FROM ChangesS400
+                          order by Id desc";
             dataTable = dBservices.GetDataTable(qry);
             return dataTable;
         }

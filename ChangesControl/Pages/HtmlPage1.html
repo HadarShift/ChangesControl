@@ -94,6 +94,10 @@
             }
         }
 
+        .CBtest {
+            text-align: center;
+            width: 50%;
+        }
     </style>
 
 
@@ -101,7 +105,14 @@
     <script language="javascript">
         $(document).ready(function () {
             
-            ajaxCall("GET", "../api/Changes", "", successCBChange, error);
+            //ajaxCall("GET", "../api/Changes", "", successCBChange, error);
+            $("#uname").val("hshiftan");
+             $("#psw").val("Hs29572")
+            //check user authentication
+            $("#Login").submit(function () {
+                event.preventDefault();
+                CheckUser();
+            })
             $("#bodyContainer").hide()
             $("#editDiv").hide();
             $("#ChangesForm").submit(function () {
@@ -110,14 +121,53 @@
             }
             );
             $("#newBTN").click(AddChange)
-
+            
         });
 
+        //check user authentication
+        function CheckUser() {
+            var userData = {
+                UserName: $("#uname").val(),
+                Password: $("#psw").val()
+            }
+            ajaxCall("POST", "../api/Changes/User", JSON.stringify(userData), successValidationUser, error);
 
+        }
 
+        //return user details after validation
+        function successValidationUser(data) {
+            User = data;//user details
+            console.log(data);
+            if (!User.IsValid) {//wrong login
+                Swal.fire({
+                    icon: 'error',
+                    title: 'שגיאה',
+                    text: "username or password is incorrect"
+                    //footer: '<a href>Why do I have this issue?</a>'
+                })
+            }
+            //good login
+            else {
+                document.getElementById("nameUser").innerHTML = User.FullName;
+                $("#Login").hide();
+                $("#bodyContainer").show();
+                str = "";
+                User.ListUsersNames.sort();
+                for (var item of User.ListUsersNames) {
+                    str += "<option>" + item + "</option>"
+                }
+                document.getElementById("Name").innerHTML = str;
+                document.getElementById("NamePrgrammer").innerHTML = str;
+                ajaxCall("GET", "../api/Changes", "", successCBChange, error);
+            }
+                
+        }
+
+        //After get changes details from db
         function successCBChange(Changes) {
             ChangesFiles = Changes; // keep the cars array in a global variable;
             try {
+                IdNext = ChangesFiles[0].Id + 1;//for the next change record
                 tbl = $('#ChangesTable').DataTable({
                     data: ChangesFiles,
                     pageLength: 7,
@@ -241,22 +291,61 @@
         function onSubmitFunc() {
             return false;
         }
+
+
         function Save() {
             if (NewOrUpdate == "New") {
 
+                //pick the table of objects affected
+                var tableObjects = document.getElementById("data_table");
+                arrObject = [];
+                for (var i = 1, row; row = tableObjects.rows[i]; i++) {
+                    var elementExists = document.getElementById("libary" + i);
+                    if (elementExists != null) {
+                        var obj = {
+                            Libary: row.cells.namedItem("libary" + i).innerHTML,
+                            Object: row.cells.namedItem("object" + i).innerHTML,
+                            Comments: row.cells.namedItem("commentObj" + i).innerHTML
+                        }
+                        arrObject.push(obj);
+                    }
+                 
+                }
+
+                //pick the table of tests
+                var tableObjects = document.getElementById("tableTestingPlan");
+                arrTest = [];
+                for (var i = 1, row; row = tableObjects.rows[i]; i++) {
+                    var elementTestExists = document.getElementById("descTest" + i);
+                    if (elementTestExists != null ){
+                        var obj = {
+                            Numerator: row.cells.namedItem("No" + i).innerHTML,
+                            Description: row.cells.namedItem("descTest" + i).innerHTML,
+                            ApprovedInitated: row.cells.namedItem("UserSign" + i).checked,
+                            ApprovedProgrammer: row.cells.namedItem("ProgSign" + i).checked
+                        }
+                        arrTest.push(obj);
+                    }
+                }
+
+
+
                 var ChangeObj = {
-                    Name: $("#Name").val(),
-                    EmployeeNum: $("#EmpNum").val(),
+                    Id: IdNext,
+                    NameInitated: $("#Name").val(),
+                    Programmer: $("#NamePrgrammer").val(),
+                    ProgrammerNum: $("#EmpNum").val(),
                     Date: $("#date").val(),
-                    File: $("#file").val(),
-                    Libary: $("#libary").val(),
                     Subject: $("#subject").val(),
-                    Description: $("#description").val()
+                    Description: $("#description").val(),
+                    FinanceApproveNecessary: $("#automatic").checked,
+                    ObjectsList: arrObject,
+                    TestsList: arrTest
                 }
                 ajaxCall("POST", "../api/Changes", JSON.stringify(ChangeObj), postChangeSuccess, postChangeError);//insert change to db
-
             }
         }
+        
 
 
         function postChangeSuccess(massege) {
@@ -294,7 +383,7 @@
             document.getElementById("edit_button" + no).style.display = "none";
             document.getElementById("save_button" + no).style.display = "block";
 
-            var name = document.getElementById("name_row" + no);
+            var name = document.getElementById("libary" + no);
             var country = document.getElementById("country_row" + no);
             var age = document.getElementById("age_row" + no);
 
@@ -312,7 +401,7 @@
             var country_val = document.getElementById("country_text" + no).value;
             var age_val = document.getElementById("age_text" + no).value;
 
-            document.getElementById("name_row" + no).innerHTML = name_val;
+            document.getElementById("libary" + no).innerHTML = name_val;
             document.getElementById("country_row" + no).innerHTML = country_val;
             document.getElementById("age_row" + no).innerHTML = age_val;
 
@@ -330,8 +419,8 @@
             var new_comment = document.getElementById("new_comment").value;
 
             var table = document.getElementById("data_table");
-            var table_len = (table.rows.length) - 1;
-            var row = table.insertRow(table_len).outerHTML = "<tr id='row" + table_len + "'><td id='name_row" + table_len + "'>" + new_libary + "</td><td id='country_row" + table_len + "'>" + new_object + "</td><td id='age_row" + table_len + "'>" + new_comment + "</td><td><input type='button' id='edit_button" + table_len + "' value='Edit' class='edit' onclick='edit_row(" + table_len + ")'> <input type='button' id='save_button" + table_len + "' value='Save' class='save' onclick='save_row(" + table_len + ")'> <input type='button' value='Delete' class='delete' onclick='delete_row(" + table_len + ")'></td></tr>";
+            var table_len = (table.rows.length)-1 ;
+            var row = table.insertRow(table_len).outerHTML = "<tr id='row" + table_len + "'><td id='libary" + table_len + "'>" + new_libary + "</td><td id='object" + table_len + "'>" + new_object + "</td><td id='commentObj" + table_len + "'>" + new_comment + "</td><td><input type='button' id='edit_button" + table_len + "' value='Edit' class='edit' onclick='edit_row(" + table_len + ")'> <input type='button' id='save_button" + table_len + "' value='Save' class='save' onclick='save_row(" + table_len + ")'> <input type='button' value='Delete' class='delete' onclick='delete_row(" + table_len + ")'></td></tr>";
 
             document.getElementById("new_libary").value = "";
             document.getElementById("new_object").value = "";
@@ -339,19 +428,25 @@
         }
         //ADD row for testing 
         function add_row_test() {
-            var No = document.getElementById("No").value;
+            var table = document.getElementById("tableTestingPlan");
             var descTest = document.getElementById("descTest").value;
-            var SignUser = document.getElementById("SignUser").value;
-            var SignDeveloper = document.getElementById("SignDeveloper").value;
+            if (document.getElementById("SignUser").checked)
+                SignUser = "checked";
+            else
+                SignUser = "";
+            if (document.getElementById("SignDeveloper").checked)
+                SignDeveloper = "checked";
+            else
+                SignDeveloper = "";
 
             var table = document.getElementById("tableTestingPlan");
             var table_len = (table.rows.length) - 1;
-            var row = table.insertRow(table_len).outerHTML = "<tr id='row" + table_len + "'><td id='name_row" + table_len + "'>" + No + "</td><td id='country_row" + table_len + "'>" + descTest + "</td><td id='age_row" + table_len + "'>" + SignUser + "</td><td><input type='button' id='edit_button" + table_len + "' value='Edit' class='edit' onclick='edit_row(" + table_len + ")'> <input type='button' id='save_button" + table_len + "' value='Save' class='save' onclick='save_row(" + table_len + ")'> <input type='button' value='Delete' class='delete' onclick='delete_row(" + table_len + ")'></td></tr>";
+            var row = table.insertRow(table_len).outerHTML = "<tr id='row" + table_len + "'><td id='No" + table_len + "' disabled>" + table_len + "</td><td id='descTest" + table_len + "'>" + descTest + "</td><td><input type='checkbox' id='UserSign" + table_len + "' class='center-block form-control' " + SignUser + " /></td></td > <td><input type='checkbox' id='ProgSign" + table_len + "' class='center-block form-control' " + SignDeveloper+" /></td> <td><input type='button' id='edit_button" + table_len + "' value='Edit' class='edit' onclick='edit_row(" + table_len + ")'> <input type='button' id='save_button" + table_len + "' value='Save' class='save' onclick='save_row(" + table_len + ")'> <input type='button' value='Delete' class='delete' onclick='delete_row(" + table_len + ")'></td></tr>";
 
-            document.getElementById("No").value = table_len;
+            document.getElementById("No").value = table_len+1;
             document.getElementById("descTest").value = "";
-            document.getElementById("SignUser").value = "";
-            document.getElementById("SignDeveloper").value = "";
+            document.getElementById("SignUser").checked = false;
+            document.getElementById("SignDeveloper").checked = false;
 
         }
         
@@ -359,6 +454,7 @@
 
 </head>
 <body>
+
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
@@ -377,31 +473,33 @@
 
         <div class="container">
             <label for="uname"><b>Username</b></label>
-            <input type="text" placeholder="Enter Username" name="uname" required>
+            <input type="text" placeholder="Enter Username" id="uname" required>
 
             <label for="psw"><b>Password</b></label>
-            <input type="password" placeholder="Enter Password" name="psw" required>
+            <input type="password" placeholder="Enter Password" id="psw" required>
 
             <button type="submit">Login</button>
             <!--<label>
-                <input type="checkbox" checked="checked" name="remember"> Remember me
-            </label>-->
+            <input type="checkbox" checked="checked" name="remember"> Remember me
+        </label>-->
         </div>
 
         <div class="container" style="background-color:#f1f1f1">
             <button type="button" class="cancelbtn">Cancel</button>
             <span class="psw">Forgot <a href="#">password?</a></span>
         </div>
+
     </form>
 
     <!--all body-->
-
     <div class="container" id="bodyContainer">
 
-        <h1>Changes</h1>
+        <h2>Hello,</h2><h2 id="nameUser"></h2>
+
         <button type="button" class="btn btn-primary btn-lg" id="newBTN">הוסף שינוי חדש</button>
 
         <form id="pForm">
+
             <table id="ChangesTable" class="display nowrap" style="width:100%">
                 <thead>
                     <tr>
@@ -424,12 +522,13 @@
                 <div class="form-group row">
                     <div class="form-group col-sm-3">
                         <label for="manufacturer"><span class="red-star">★ </span>שם יזם</label>
-                        <input type="text" class="form-control" id="Name" placeholder="Enter the Initator name" required>
+                        <!--<input type="text" class="form-control" id="Name" placeholder="Enter the Initator name" required>-->
+                        <select class="form-control" id="Name" placeholder="Enter the Initator name" required><option>בחר שם יזם</option></select>
                     </div>
 
                     <div class="form-group col-sm-3">
                         <label for="manufacturer"><span class="red-star">★ </span>שם מפתח</label>
-                        <input type="text" class="form-control" id="NamePrgrammer" placeholder="Enter the Initator name" required>
+                        <input type="text" class="form-control" id="NamePrgrammer" placeholder="Enter the Programmer name" required>
                     </div>
 
                     <div class="form-group col-sm-3">
@@ -440,16 +539,17 @@
 
                     <div class="form-group col-sm-3">
                         <label for="year"><span class="red-star">★ </span>תאריך</label>
-                        <input type="text" class="form-control" id="date" placeholder="Enter the model name" required>
+                        <input type="date" class="form-control" id="date" placeholder="Enter the model name" required>
 
 
+           
                         <!--<select id="year" class="form-control" required>
-                            <option value="">Choose Year</option>
-                            <option value="2019">2019</option>
-                            <option value="2018">2018</option>
-                            <option value="2017">2017</option>
-                            <option value="2016">2016</option>
-                        </select>-->
+        <option value="">Choose Year</option>
+        <option value="2019">2019</option>
+        <option value="2018">2018</option>
+        <option value="2017">2017</option>
+        <option value="2016">2016</option>
+    </select>-->
                     </div>
 
                 </div>
@@ -467,8 +567,8 @@
                     </div>
 
                     <!--<div class="form-group col-sm-4">
-                        <img src="images/car.jpg" id="image" />
-                    </div>-->
+                    <img src="images/car.jpg" id="image" />
+                </div>-->
 
                     <div class="form-group row">
                         <div class="form-group col-sm-8">
@@ -479,8 +579,6 @@
                                     <th>Object</th>
                                     <th>Comment</th>
                                 </tr>
-
-
 
                                 <tr>
                                     <td><input type="text" id="new_libary"></td>
@@ -509,10 +607,10 @@
 
 
                                 <tr>
-                                    <td><input type="text" id="No"></td>
+                                    <td><input type="text" id="No" disabled value="1"></td>
                                     <td><input type="text" id="descTest"></td>
-                                    <td><button id="SignUser" class="center-block">User</button></td>
-                                    <td><button id="SignDeveloper" class="center-block">Developer</button></td>
+                                    <td><input type="checkbox" id="SignUser" class="center-block form-control">User</td>
+                                    <td><input type="checkbox" id="SignDeveloper" class="center-block form-control">Developer</td>
                                     <td><input type="button" class="add" onclick="add_row_test();" value="הוסף שורה"></td>
                                 </tr>
 
@@ -533,9 +631,9 @@
                 <div class="form-group row">
 
                     <!--<div class="form-group col-sm-3">
-                        <label for="file"><span class="red-star">★ </span>קובץ</label>
-                        <input type="number" class="form-control" id="file" placeholder="Enter the price" required />
-                    </div>-->
+                    <label for="file"><span class="red-star">★ </span>קובץ</label>
+                    <input type="number" class="form-control" id="file" placeholder="Enter the price" required />
+                </div>-->
 
                     <div class="form-group col-sm-3">
                         <label for="libary"><span class="red-star">★ </span>ספריה</label>

@@ -178,7 +178,7 @@ public class DBservices
         // use a string builder to create the dynamic string
         String prefix = "";
 
-        sb.AppendFormat("Values({0},'{1}','{2}','{3}','{4}','{5}','{6}','{7}',{8})",change.EmployeeNum, change.Name,DateTime.Parse(change.Date.ToString()).ToString("yyyy-MM-dd"),change.File,change.Libary,change.Subject,change.Description,change.AddedFile,0); //sb.AppendFormat("Values('{0}',{1},{2},'{3}')") destination.City, destination.LenLat, destination.LenLon, destination.Code
+        sb.AppendFormat("Values({0},'{1}','{2}','{3}','{4}','{5}','{6}','{7}',{8})",change.ProgrammerNum, change.NameInitated,DateTime.Parse(change.Date.ToString()).ToString("yyyy-MM-dd"),change.FinanceApproveNecessary,change.FinanceApproveNecessary,change.Subject,change.Description,change.FinanceApproveNecessary,0); //sb.AppendFormat("Values('{0}',{1},{2},'{3}')") destination.City, destination.LenLat, destination.LenLon, destination.Code
         prefix = "INSERT INTO ChangesS400 " + "(EmployeeNum,[Name],[Date],[File],[Libary],[Subject],[Description],AddFilePath,Approved) ";
             command = prefix + sb.ToString();
 

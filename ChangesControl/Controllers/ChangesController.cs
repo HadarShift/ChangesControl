@@ -15,21 +15,19 @@ namespace ChangesControl.Controllers
 {
     public class ChangesController : ApiController
     {
+        [HttpPost]
+        [Route("api/Changes/User")]
+        public User CheckUser(User UserDetails)
+        {
+            UserDetails.IsValidUser();
+            return UserDetails;
+        }
+
         Changes changes = new Changes();        
         // GET api/values
         public DataTable Get()
         {
-            //check user authentication
-            string strAccountId = "hshiftan";
-            string strPassword = "Hs29571";
-            string Domain = System.DirectoryServices.ActiveDirectory.Domain.GetComputerDomain().ToString();
-
-
-            using (PrincipalContext pc = new PrincipalContext(ContextType.Domain, Domain))
-            {
-                // validate the credentials
-                bool isValid = pc.ValidateCredentials(strAccountId, strPassword);
-            }
+          
             DataTable dataTable = new DataTable();
             dataTable=changes.GetFromDB();
             return dataTable;
