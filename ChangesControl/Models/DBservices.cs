@@ -15,7 +15,8 @@ public class DBservices
 {
     public SqlDataAdapter da;
     public DataTable dt;
-
+    SqlConnection con;
+    SqlCommand cmd;
     public DBservices()
     {
         //
@@ -24,7 +25,18 @@ public class DBservices
     }
 
 
-
+    public void Connection()
+    {
+        try
+        {
+            con = connect("DBConnectionString"); // create the connection
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+    }
 
     //--------------------------------------------------------------------------------------------------
     // connection
@@ -44,6 +56,7 @@ public class DBservices
         con.Open();
         return con;
     }
+
 
     //---------------------------------------------------------------------------------
     // Create the SqlCommand
@@ -118,19 +131,6 @@ public class DBservices
     public int insert(string query)
     {
 
-        SqlConnection con;
-        SqlCommand cmd;
-
-        try
-        {
-            con = connect("DBConnectionString"); // create the connection
-        }
-        catch (Exception ex)
-        {
-            // write to log
-            throw (ex);
-        }
-
         try
         {
             int numEffected = 0;
@@ -139,10 +139,6 @@ public class DBservices
                 //cStr = BuildInsertCommand();      // helper method to build the insert string
                 cmd = CreateCommand(query, con);             // create the command
                 numEffected += cmd.ExecuteNonQuery(); // execute the command
-
-            
-
-
             return numEffected;
             }
 
@@ -170,23 +166,29 @@ public class DBservices
     //--------------------------------------------------------------------
     // query format
     //--------------------------------------------------------------------
-    public String BuildInsertCommand(Changes change)
+    public String BuildInsertChanges(Changes change)
     {
         String command;
         
         StringBuilder sb = new StringBuilder();
         // use a string builder to create the dynamic string
-        String prefix = "";
-
-        sb.AppendFormat("Values({0},'{1}','{2}','{3}','{4}','{5}','{6}','{7}',{8})",change.ProgrammerNum, change.NameInitated,DateTime.Parse(change.Date.ToString()).ToString("yyyy-MM-dd"),change.FinanceApproveNecessary,change.FinanceApproveNecessary,change.Subject,change.Description,change.FinanceApproveNecessary,0); //sb.AppendFormat("Values('{0}',{1},{2},'{3}')") destination.City, destination.LenLat, destination.LenLon, destination.Code
-        prefix = "INSERT INTO ChangesS400 " + "(EmployeeNum,[Name],[Date],[File],[Libary],[Subject],[Description],AddFilePath,Approved) ";
-            command = prefix + sb.ToString();
-
+        command = $@"INSERT INTO ChangessS400 VALUES({change.Id},'{change.NameInitated}','{change.Programmer}',{change.ProgrammerNum},'{change.Date}','{change.Subject}','{change.Description}',{change.ApprovedIt},{change.AprrovedInitated},{change.FinanceApproveNecessary},{change.ApprovedFinance})";
         return command;
     }
 
+    /// <summary>
+    /// query for objects changed in one change
+    /// </summary>
+    internal string BuildInsertObjectsAffected(Changes change)
+    {
+        String command;
 
- 
+        StringBuilder sb = new StringBuilder();
+        // use a string builder to create the dynamic string
+        command = $@"INSERT INTO ChangesObject VALUES('{change.Id}',)";//להשלים
+        return command;
+    }
+
 
     /// <summary>
     /// import from db format

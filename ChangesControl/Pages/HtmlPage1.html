@@ -317,12 +317,13 @@
                 arrTest = [];
                 for (var i = 1, row; row = tableObjects.rows[i]; i++) {
                     var elementTestExists = document.getElementById("descTest" + i);
-                    if (elementTestExists != null ){
+                    if (elementTestExists != null) {
+                    
                         var obj = {
                             Numerator: row.cells.namedItem("No" + i).innerHTML,
                             Description: row.cells.namedItem("descTest" + i).innerHTML,
-                            ApprovedInitated: row.cells.namedItem("UserSign" + i).checked,
-                            ApprovedProgrammer: row.cells.namedItem("ProgSign" + i).checked
+                            ApprovedInitated: document.getElementById("UserSign" + i).checked,
+                            ApprovedProgrammer: document.getElementById("ProgSign" + i).checked
                         }
                         arrTest.push(obj);
                     }

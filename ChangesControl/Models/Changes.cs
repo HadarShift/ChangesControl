@@ -41,8 +41,14 @@ namespace ChangesControl.Models
 
         internal void PostToDB(Changes change)
         {
-            string qry = dBservices.BuildInsertCommand(change);
+            List<string> qryList = new List<string>();
+            //insert to master data 
+            string qry = dBservices.BuildInsertChanges(change);
+            qryList.Add(qry);
+            qry=dBservices.BuildInsertCommand
             dBservices.insert(qry);
+            
+
         
         }
     }
