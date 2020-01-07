@@ -182,26 +182,40 @@
                             }
                         },
 
-                        { data: "Id" },
-                        { data: "Name" },
-                        { data: "EmployeeNum" },
-                        { data: "Date" },
-                        { data: "File" },
-                        { data: "Libary" },
+                        { data: "Programmer" },
                         { data: "Subject" },
+                        { data: "Date" },
+                 
                         {
-                            data: "Approved",
+                            data: "AprrovedInitated",
+                            render: function (data, type, row, meta) {
+                                if (data)
+                                    AprrovedInitated = "<button type='button' style='background-color: green'> Initated </button>"
+                                else
+                                    AprrovedInitated = "<button type='button' style='background-color: red'> Initated </button>"
+
+                                return AprrovedInitated 
+                            }
+                        },
+                        {
+                            data: "AprrovedIt",
                             render: function (data, type, row, meta) {
                                 if (data)
                                     ApprovedIt = "<button type='button' style='background-color: green'> IT MANAGER </button>"
                                 else
                                     ApprovedIt = "<button type='button' style='background-color: red'> IT MANAGER </button>"
-
-                                ApprovedUser = "<button type='button' style='background-color: green'> USER </button>"
-                                AprrovedFinance = "<button type='button' style='background-color: green'> FINANCE </button>"
-                                return ApprovedIt + ApprovedUser + AprrovedFinance
                             }
+                        },
+                        {
+                            data: "AprrovedFinance",
+                            render: function (data, type, row, meta) {
+                                if (data)
+                                    ApprovedIt = "<button type='button' style='background-color: green'> IT MANAGER </button>"
+                                else
+                                    ApprovedIt = "<button type='button' style='background-color: red'> IT MANAGER </button>"
+                            }///לשנות את הכותרות של הטבלה. לבדוק לגבי כפתורים של פיננסי
                         }
+
                         //{
                         //    data: "Automatic",
                         //    render: function (data, type, row, meta) {
@@ -339,7 +353,7 @@
                     Date: $("#date").val(),
                     Subject: $("#subject").val(),
                     Description: $("#description").val(),
-                    FinanceApproveNecessary: $("#automatic").checked,
+                    FinanceApproveNecessary: $("#automatic").is(':checked') ,
                     ObjectsList: arrObject,
                     TestsList: arrTest
                 }

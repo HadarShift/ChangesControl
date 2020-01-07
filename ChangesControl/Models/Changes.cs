@@ -41,15 +41,36 @@ namespace ChangesControl.Models
 
         internal void PostToDB(Changes change)
         {
-            List<string> qryList = new List<string>();
-            //insert to master data 
-            string qry = dBservices.BuildInsertChanges(change);
-            qryList.Add(qry);
-            qry=dBservices.BuildInsertCommand
-            dBservices.insert(qry);
-            
+            string itemQry = "";
+            try
+            {
+                List<string> qryList = new List<string>();
+                //insert to master data 
+                string qry = dBservices.BuildInsertChanges(change);
+                qryList.Add(qry);
+                for (int i = 0; i < change.ObjectsList.Count; i++)
+                {
+                    qry = dBservices.BuildInsertObjectsAffected(change.ObjectsList[i], Id);
+                    qryList.Add(qry);
+                }
+                for (int i = 0; i < change.TestsList.Count; i++)
+                {
+                    qry = dBservices.BuildInsertObjectsAffected(change.TestsList[i], Id);
+                    qryList.Add(qry);
+                }
+                foreach (var item in qryList)
+                {
+                    dBservices.insert(item);
+                    itemQry = item;
+                }
+            }
+            catch(Exception ex)
+            {
+                LogWaveClass.LogWave("שגיאת הכנסה לדטהבייס " +itemQry+" "+ ex.Message);
+            }
 
-        
+
+
         }
     }
 }

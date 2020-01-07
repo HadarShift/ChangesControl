@@ -133,14 +133,15 @@ public class DBservices
 
         try
         {
+            Connection();
             int numEffected = 0;
-           
-              
-                //cStr = BuildInsertCommand();      // helper method to build the insert string
-                cmd = CreateCommand(query, con);             // create the command
-                numEffected += cmd.ExecuteNonQuery(); // execute the command
+
+
+            //cStr = BuildInsertCommand();      // helper method to build the insert string
+            cmd = CreateCommand(query, con);             // create the command
+            numEffected += cmd.ExecuteNonQuery(); // execute the command
             return numEffected;
-            }
+        }
 
         catch (Exception ex)
         {
@@ -172,23 +173,24 @@ public class DBservices
         
         StringBuilder sb = new StringBuilder();
         // use a string builder to create the dynamic string
-        command = $@"INSERT INTO ChangessS400 VALUES({change.Id},'{change.NameInitated}','{change.Programmer}',{change.ProgrammerNum},'{change.Date}','{change.Subject}','{change.Description}',{change.ApprovedIt},{change.AprrovedInitated},{change.FinanceApproveNecessary},{change.ApprovedFinance})";
+        command = $@"INSERT INTO ChangessS400 VALUES({change.Id},'{change.NameInitated}','{change.Programmer}',{change.ProgrammerNum},'{change.Date}','{change.Subject}','{change.Description}','{change.ApprovedIt}','{change.AprrovedInitated}','{change.FinanceApproveNecessary}','{change.ApprovedFinance}')";
         return command;
     }
 
     /// <summary>
     /// query for objects changed in one change
     /// </summary>
-    internal string BuildInsertObjectsAffected(Changes change)
+    internal string BuildInsertObjectsAffected(Objects obj,int Id)
     {
-        String command;
-
-        StringBuilder sb = new StringBuilder();
-        // use a string builder to create the dynamic string
-        command = $@"INSERT INTO ChangesObject VALUES('{change.Id}',)";//להשלים
+        String command = $@"INSERT INTO ChangesObject VALUES({Id},'{obj.Libary}','{obj.Object}','{obj.Comments}')";
         return command;
     }
 
+    internal string BuildInsertObjectsAffected(Tests test, int Id)
+    {
+        String command = $@"INSERT INTO ChangesTest VALUES({Id},'{test.Description}','{test.ApprovedInitated}','{test.ApprovedProgrammer}'";
+        return command;
+    }
 
     /// <summary>
     /// import from db format
