@@ -33,7 +33,7 @@ namespace ChangesControl.Models
         {
             DataTable dataTable = new DataTable();
             string qry = $@"SELECT *
-                          FROM ChangesS400
+                          FROM ChangessS400
                           order by Id desc";
             dataTable = dBservices.GetDataTable(qry);
             return dataTable;

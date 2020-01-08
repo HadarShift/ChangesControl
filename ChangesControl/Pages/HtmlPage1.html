@@ -28,6 +28,7 @@
 
         body {
             font-family: Arial, Helvetica, sans-serif;
+
         }
 
         form {
@@ -98,6 +99,12 @@
             text-align: center;
             width: 50%;
         }
+
+        #ChangesTable{
+            text-align:center;
+        }
+
+       
     </style>
 
 
@@ -181,7 +188,7 @@
                                 return editBtn + viewBtn
                             }
                         },
-
+                        { data:"NameInitated"},
                         { data: "Programmer" },
                         { data: "Subject" },
                         { data: "Date" },
@@ -189,10 +196,12 @@
                         {
                             data: "AprrovedInitated",
                             render: function (data, type, row, meta) {
+                                let dataInitated = "data-InitatedId='" + row.Id + "'";
+                                let color = "red";
                                 if (data)
-                                    AprrovedInitated = "<button type='button' style='background-color: green'> Initated </button>"
-                                else
-                                    AprrovedInitated = "<button type='button' style='background-color: red'> Initated </button>"
+                                    color = "green";
+                                AprrovedInitated = `<button type='button' style='background-color: ${color}' ${dataInitated} class='Approved' > ${ row.NameInitated } </button >`
+
 
                                 return AprrovedInitated 
                             }
@@ -200,42 +209,33 @@
                         {
                             data: "AprrovedIt",
                             render: function (data, type, row, meta) {
+                                let dataIt = "data-ItId='" + row.Id + "'";
+                                let color = "red";
                                 if (data)
-                                    ApprovedIt = "<button type='button' style='background-color: green'> IT MANAGER </button>"
-                                else
-                                    ApprovedIt = "<button type='button' style='background-color: red'> IT MANAGER </button>"
+                                    color = "green";
+                                ApprovedIt = `<button type='button' style='background-color: ${color}' ${dataIt} class='Approved'> IT MANAGER </button>`                       
+                                return ApprovedIt
                             }
                         },
                         {
-                            data: "AprrovedFinance",
+                            data: "FinanceApproveNecessary",
                             render: function (data, type, row, meta) {
-                                if (data)
-                                    ApprovedIt = "<button type='button' style='background-color: green'> IT MANAGER </button>"
+                                if (data) {
+                                    let dataFinance = "data-FinanceId='" + row.Id + "'";
+                                    let color = "red";
+                                    if (row.ApprovedFinance)
+                                        color = "green";
+                                    ApprovedFinance = `<button type='button' style='background-color: ${color}' ${dataFinance} class='Approved' > Finance MANAGER </button >`                                                        
+                                    return ApprovedFinance;
+                                }
                                 else
-                                    ApprovedIt = "<button type='button' style='background-color: red'> IT MANAGER </button>"
-                            }///לשנות את הכותרות של הטבלה. לבדוק לגבי כפתורים של פיננסי
+                                    return null;
+                             
+                            }
                         }
-
-                        //{
-                        //    data: "Automatic",
-                        //    render: function (data, type, row, meta) {
-                        //        if (data == true)
-                        //            return '<input type="checkbox" checked disabled="disabled" />';
-                        //        else
-                        //            return '<input type="checkbox" disabled="disabled"/>';
-                        //    }
-                        //},
-                        //{
-                        //    data: "Description",
-                        //    visible: false
-                        //},
-                        //{
-                        //    data: "Image",
-                        //    visible: false
-                        //}
+            
                     ],
                 });
-                //buttonEvents();
             }
 
             catch (err) {
@@ -269,6 +269,11 @@
             $("#editDiv").show();
             $("#editDiv :input").prop("disabled", false); // edit mode: enable all controls in the form
             populateFields(this.getAttribute('data-ID')); // fill the form fields according to the selected row
+        });
+
+        $(document).on("click", ".Approved", function () {
+            row = (this.parentNode).parentNode; // button is in TD which is in Row
+            att= this.getAttribute(")
         });
 
         // fill the form fields
@@ -519,14 +524,13 @@
                 <thead>
                     <tr>
                         <th></th>
-                        <th></th>
                         <th>Initated by</th>
-                        <th>EmployeeNum</th>
-                        <th>Date</th>
-                        <th>File</th>
-                        <th>Libary</th>
+                        <th>Programmer</th>
                         <th>Subject</th>
-                        <th>Approve</th>
+                        <th>Date</th>
+                        <th>Aprroved Initated</th>
+                        <th>Approved It</th>
+                        <th>Approve Finance</th>
                     </tr>
                 </thead>
             </table>
