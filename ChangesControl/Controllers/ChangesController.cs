@@ -15,12 +15,30 @@ namespace ChangesControl.Controllers
 {
     public class ChangesController : ApiController
     {
+        User UserDetails = new User();
+
         [HttpPost]
         [Route("api/Changes/User")]
         public User CheckUser(User UserDetails)
         {
-            UserDetails.IsValidUser();
+            this.UserDetails = UserDetails;
+            this.UserDetails.IsValidUser();
             return UserDetails;
+        }
+
+        /// <summary>
+        /// check if user can sign on record change
+        /// </summary>
+        [HttpGet]
+        [Route("api/Changes/User/{fullNameUser}/{UserName}/{TypeApprove}/{idChange}")]
+        public bool CheckUser(string fullNameUser, string userName,string TypeApprove ,string idChange )
+        {
+            string[] id = idChange.Split('-');
+            idChange = id[1];
+            bool check =false;
+            Changes change = new Changes();
+            check=change.CheckifCanApprove(fullNameUser,userName,TypeApprove,idChange);
+            return check;
         }
 
         Changes changes = new Changes();        

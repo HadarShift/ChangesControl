@@ -279,6 +279,8 @@ public class DBservices
             DataSet ds = new DataSet();
             da.Fill(ds);
             dataTable = ds.Tables[0];
+            cmd = CreateCommand(qry, con);             // create the command
+         
         }
 
         catch (Exception ex)
@@ -301,7 +303,7 @@ public class DBservices
 
     }
 
-    public void update()
+    public void update(DataTable dt)
     {
         da.Update(dt);
     }

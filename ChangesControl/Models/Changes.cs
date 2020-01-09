@@ -39,6 +39,7 @@ namespace ChangesControl.Models
             return dataTable;
         }
 
+
         internal void PostToDB(Changes change)
         {
             string itemQry = "";
@@ -69,8 +70,63 @@ namespace ChangesControl.Models
                 LogWaveClass.LogWave("שגיאת הכנסה לדטהבייס " +itemQry+" "+ ex.Message);
             }
 
+        }
+        /// <summary>
+        /// check if current user can approve the change
+        /// </summary>
+        internal bool CheckifCanApprove(string fullNameUser, string userName, string typeApprove, string idChange)
+        {
+            bool check = false;
+            int Id = int.Parse(idChange);
+            try
+            {
+                string qry = "";
+                switch (typeApprove)//which type of button was clicked
+                {
+                    case "Initated":
+                        qry = $@"SELECT *
+                             FROM ChangessS400
+                             WHERE NameInitated='{fullNameUser}' and Id={Id}";
+                        break;
 
+                    case "It":
+                        qry = $@"SELECT *
+                            FROM ChangesPremission
+                            WHERE UserName='{userName}' and It = 'TRUE'";
+                        break;
+
+                    case "Finance":
+                        qry = $@"SELECT *
+                            FROM ChangesPremission
+                            WHERE UserName='{userName}' and Finance = 'TRUE'";
+                        break;
+                }
+                DataTable dataTable = new DataTable();
+                dataTable = dBservices.GetDataTable(qry);
+                if (dataTable.Rows.Count >= 1)//can sign
+                {
+                    //update approve field to true
+                    qry = $@"SELECT *
+                           FROM ChangessS400
+                           WHERE Id={Id}";
+                    dataTable = dBservices.GetDataTable(qry);
+                    dataTable.Rows[0][typeApprove] = true;
+                    dBservices.update(dataTable);
+                    check = true;
+
+                }
+                else
+                    check = false;
+                            
+            }
+
+            catch(Exception ex)
+            {
+                LogWaveClass.LogWave(ex.Message);
+            }
+            return check;
 
         }
+
     }
 }

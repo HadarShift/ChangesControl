@@ -19,7 +19,7 @@
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
-
+    <script src="../Scripts/JavaScript.js"></script>
     <style>
         #newBTN {
             background-color: orange;
@@ -28,7 +28,6 @@
 
         body {
             font-family: Arial, Helvetica, sans-serif;
-
         }
 
         form {
@@ -54,9 +53,9 @@
             width: 100%;
         }
 
-            button:hover {
-                opacity: 0.8;
-            }
+        button:hover {
+            opacity: 0.8;
+        }
 
         .cancelbtn {
             width: auto;
@@ -100,18 +99,16 @@
             width: 50%;
         }
 
-        #ChangesTable{
-            text-align:center;
+        #ChangesTable {
+            text-align: center;
         }
-
-       
     </style>
 
 
 
-    <script language="javascript">
+    <!--<script language="javascript">
         $(document).ready(function () {
-            
+
             //ajaxCall("GET", "../api/Changes", "", successCBChange, error);
             $("#uname").val("hshiftan");
              $("#psw").val("Hs29572")
@@ -128,12 +125,12 @@
             }
             );
             $("#newBTN").click(AddChange)
-            
+
         });
 
         //check user authentication
         function CheckUser() {
-            var userData = {
+            userData = {
                 UserName: $("#uname").val(),
                 Password: $("#psw").val()
             }
@@ -167,7 +164,7 @@
                 document.getElementById("NamePrgrammer").innerHTML = str;
                 ajaxCall("GET", "../api/Changes", "", successCBChange, error);
             }
-                
+
         }
 
         //After get changes details from db
@@ -192,28 +189,26 @@
                         { data: "Programmer" },
                         { data: "Subject" },
                         { data: "Date" },
-                 
+
                         {
                             data: "AprrovedInitated",
                             render: function (data, type, row, meta) {
-                                let dataInitated = "data-InitatedId='" + row.Id + "'";
                                 let color = "red";
                                 if (data)
                                     color = "green";
-                                AprrovedInitated = `<button type='button' style='background-color: ${color}' ${dataInitated} class='Approved' > ${ row.NameInitated } </button >`
+                                AprrovedInitated = `<button type='button' style='background-color: ${color}' data-type='Initated' id='Initated${row.id}' class='Approved' > ${ row.NameInitated } </button >`
 
 
-                                return AprrovedInitated 
+                                return AprrovedInitated
                             }
                         },
                         {
                             data: "AprrovedIt",
                             render: function (data, type, row, meta) {
-                                let dataIt = "data-ItId='" + row.Id + "'";
                                 let color = "red";
                                 if (data)
                                     color = "green";
-                                ApprovedIt = `<button type='button' style='background-color: ${color}' ${dataIt} class='Approved'> IT MANAGER </button>`                       
+                                ApprovedIt = `<button type='button' style='background-color: ${color}' data-type='It' id='It${row.id}' class='Approved'> IT MANAGER </button>`
                                 return ApprovedIt
                             }
                         },
@@ -221,19 +216,18 @@
                             data: "FinanceApproveNecessary",
                             render: function (data, type, row, meta) {
                                 if (data) {
-                                    let dataFinance = "data-FinanceId='" + row.Id + "'";
                                     let color = "red";
                                     if (row.ApprovedFinance)
                                         color = "green";
-                                    ApprovedFinance = `<button type='button' style='background-color: ${color}' ${dataFinance} class='Approved' > Finance MANAGER </button >`                                                        
+                                    ApprovedFinance = `<button type='button' style='background-color: ${color}' data-type='Finance' id='Finance${row.id}' class='Approved' > Finance MANAGER </button >`
                                     return ApprovedFinance;
                                 }
                                 else
                                     return null;
-                             
+
                             }
                         }
-            
+
                     ],
                 });
             }
@@ -271,9 +265,17 @@
             populateFields(this.getAttribute('data-ID')); // fill the form fields according to the selected row
         });
 
+        //clicked on signature
         $(document).on("click", ".Approved", function () {
             row = (this.parentNode).parentNode; // button is in TD which is in Row
-            att= this.getAttribute(")
+            caseButton = this.getAttribute("data-type")//which type button approve?IT/finance/user
+            //check if current user can sign
+            userData.
+            switch (att) {
+                case 'Initated':
+                    caseButton=
+                    break;
+            }
         });
 
         // fill the form fields
@@ -328,7 +330,7 @@
                         }
                         arrObject.push(obj);
                     }
-                 
+
                 }
 
                 //pick the table of tests
@@ -337,7 +339,7 @@
                 for (var i = 1, row; row = tableObjects.rows[i]; i++) {
                     var elementTestExists = document.getElementById("descTest" + i);
                     if (elementTestExists != null) {
-                    
+
                         var obj = {
                             Numerator: row.cells.namedItem("No" + i).innerHTML,
                             Description: row.cells.namedItem("descTest" + i).innerHTML,
@@ -365,7 +367,7 @@
                 ajaxCall("POST", "../api/Changes", JSON.stringify(ChangeObj), postChangeSuccess, postChangeError);//insert change to db
             }
         }
-        
+
 
 
         function postChangeSuccess(massege) {
@@ -432,7 +434,7 @@
         function delete_row(no) {
             document.getElementById("row" + no + "").outerHTML = "";
         }
-        //ADD row for libary and Objects 
+        //ADD row for libary and Objects
         function add_row_updates() {
             var new_libary = document.getElementById("new_libary").value;
             var new_object = document.getElementById("new_object").value;
@@ -446,7 +448,7 @@
             document.getElementById("new_object").value = "";
             document.getElementById("new_comment").value = "";
         }
-        //ADD row for testing 
+        //ADD row for testing
         function add_row_test() {
             var table = document.getElementById("tableTestingPlan");
             var descTest = document.getElementById("descTest").value;
@@ -469,8 +471,8 @@
             document.getElementById("SignDeveloper").checked = false;
 
         }
-        
-    </script>
+
+    </script>-->
 
 </head>
 <body>
