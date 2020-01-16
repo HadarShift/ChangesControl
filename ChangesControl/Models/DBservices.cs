@@ -188,18 +188,19 @@ public class DBservices
 
     internal string BuildInsertObjectsAffected(Tests test, int Id)
     {
-        String command = $@"INSERT INTO ChangesTest VALUES({Id},'{test.Description}','{test.ApprovedInitated}','{test.ApprovedProgrammer}'";
+        String command = $@"INSERT INTO ChangesTest VALUES({Id},'{test.Description}','{test.ApprovedInitated}','{test.ApprovedProgrammer}')";
         return command;
     }
 
     /// <summary>
     /// import from db format
     /// </summary>
-    internal void importData()
+    internal List<User> importDataChangesPremission()
     {
         SqlConnection con;
         SqlCommand cmd;
-
+        User user = new User();
+        List<User> usersList = new List<User>();
         try
         {
             con = connect("DBConnectionString"); // create the connection
@@ -212,15 +213,21 @@ public class DBservices
 
         try
         {
-            String cStr = $@"SELECT *
-                        FROM Airport_2020"; ;
+            String cStr = $@"SELECT*
+                             FROM ChangesPremission"; ;
             cmd = CreateCommand(cStr, con);             // create the command
             SqlDataReader reader = cmd.ExecuteReader();
             if (reader.HasRows)
             {
                 while (reader.Read())
                 {
-                   //reader
+                    user.UserName = reader["UserName"].ToString();
+                    user.FullName = reader["Name"].ToString();
+                    user.PremissionEdit = Convert.ToBoolean(reader["Edit"]);
+                    user.PremissionIT= Convert.ToBoolean(reader["It"]);
+                    user.PremissionFinance= Convert.ToBoolean(reader["Finance"]);
+                    usersList.Add(user);
+                    user = new User();
                 }
             }
             else
@@ -245,7 +252,7 @@ public class DBservices
                 con.Close();
             }
         }
-      
+        return usersList;
    
     }
     //--------------------------------------------------------------------

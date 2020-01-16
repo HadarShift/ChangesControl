@@ -1,11 +1,13 @@
-﻿$(document).ready(function () {
-
-    //ajaxCall("GET", "../api/Changes", "", successCBChange, error);
+﻿var IDOfRecord = ''
+Premission=''
+$(document).ready(function () {
+    NewOrUpdate = '';//new record or old one
     $("#uname").val("hshiftan");
-    $("#psw").val("Hs29572")
+    $("#psw").val("Hs29572");
     //check user authentication
     $("#Login").submit(function () {
         event.preventDefault();
+        $("body").css("cursor", "progress");
         CheckUser();
     })
     $("#bodyContainer").hide()
@@ -16,11 +18,14 @@
     }
     );
     $("#newBTN").click(AddChange)
+    ajaxCall("GET", "../api/Changes/PermissionsUsers", "", PermissionsUsers, error);
+
 
 });
 
 //check user authentication
 function CheckUser() {
+    //get the users Permissions
     userData = {
         UserName: $("#uname").val(),
         Password: $("#psw").val()
@@ -28,9 +33,15 @@ function CheckUser() {
     ajaxCall("POST", "../api/Changes/User", JSON.stringify(userData), successValidationUser, error);
 
 }
+//get the users Permissions
+function PermissionsUsers(data) {
+    console.log(data);
+    PermissionsUsersArr = data;
+}
 
 //return user details after validation
 function successValidationUser(data) {
+    $("body").css("cursor", "default");
     User = data;//user details
     console.log(data);
     if (!User.IsValid) {//wrong login
@@ -53,6 +64,18 @@ function successValidationUser(data) {
         }
         document.getElementById("Name").innerHTML = str;
         document.getElementById("NamePrgrammer").innerHTML = str;
+        //check if the user has special Permissions-edit/it/finance
+        PermissionUser = PermissionsUsersArr.find(p => p.UserName.trim() == User.UserName.trim())
+        if (PermissionUser != 'undefined')
+            PremissionEdit = false
+        else {
+            if (PermissionUser.PremissionEdit)
+                PremissionEdit = true
+            else
+                PremissionEdit = false
+        }
+          
+
         ajaxCall("GET", "../api/Changes", "", successCBChange, error);
     }
 
@@ -70,10 +93,14 @@ function successCBChange(Changes) {
                 {
                     render: function (data, type, row, meta) {//build for any row
                         let dataChange = "data-ID='" + row.Id + "'";
-
-                        editBtn = "<button type='button' class = 'editBtn btn btn-success' " + dataChange + "> Edit </button>";
                         viewBtn = "<button type='button' class = 'viewBtn btn btn-info' " + dataChange + "> View </button>";
-                        return editBtn + viewBtn
+                        if (User.FullName == row.Programmer || PermissionUser) //if the name of current user match the programmer or if the user has premission
+                        {
+                            editBtn = "<button type='button' class = 'editBtn btn btn-success' " + dataChange + "> Edit </button>";
+                            return editBtn + viewBtn
+                        }
+                        else
+                            return viewBtn
                     }
                 },
                 { data: "NameInitated" },
@@ -150,6 +177,7 @@ function markSelected(btn) {
 
 //edit button-relase all inputs
 $(document).on("click", ".editBtn", function () {
+    NewOrUpdate = "Update"
     markSelected(this);
     $("#editDiv").show();
     $("#editDiv :input").prop("disabled", false); // edit mode: enable all controls in the form
@@ -159,6 +187,7 @@ $(document).on("click", ".editBtn", function () {
 //clicked on signature 
 $(document).on("click", ".Approved", function () {
     //recognize which change button
+    NewOrUpdate="Update"
     row = (this.parentNode).parentNode; // button is in TD which is in Row
     caseButton = this.getAttribute("data-type")//which type button approve?IT/finance/user
     idChange = this.getAttribute("id");
@@ -211,32 +240,44 @@ function error(e) {
 
 
 // fill the form fields
-function populateFields(ChangeID) {
-    objectChange = getObject(ChangeID);
-    $("#Name").val(objectChange.Name);
-    $("#EmpNum").val(objectChange.EmployeeNum);
-    $("#date").val(objectChange.Date);
-    $("#file").val(objectChange.File);
-    $("#libary").val(objectChange.Libary);
-    $("#subject").val(objectChange.Subject);
-    $("#description").val(objectChange.Description);
-    //$("#automatic").prop('checked', car.Automatic);
-    //$("#image").attr("src", "images/" + car.Image);
-
+function populateFields(ChangeIDlocal) {
+    ChangeID = ChangeIDlocal
+    ajaxCall("GET", `../api/Changes/getChange/${ChangeID}`, "", GetDataChange, error);    
 }
 
-// get a car according to its Id
-function getObject(id) {
-    ajaxCall("GET", `../api/Changes/User/${User.FullName}/${User.UserName}/${caseButton}/${idChange}`, "", CheckIfcanSign, error);
-    for (i in ChangesFiles) {
-        if (ChangesFiles[i].Id == id)
-            return ChangesFiles[i];
+//get data of change after click on edit/view
+function GetDataChange(objectChange) {
+    NewOrUpdate = "Update";
+    ClearFields();
+    $("#Name").val(objectChange.NameInitated);
+    $("#NamePrgrammer").val(objectChange.Programmer);
+    $("#EmpNum").val(objectChange.ProgrammerNum);
+    $("#date").val(objectChange.Date);
+    $("#subject").val(objectChange.Subject);
+    $("#description").val(objectChange.Description);
+    for (var i = 0; i < objectChange.ObjectsList.length; i++) {
+        $("#new_libary").val(objectChange.ObjectsList[i].Libary);
+        $("#new_object").val(objectChange.ObjectsList[i].Object);
+        $("#new_comment").val(objectChange.ObjectsList[i].Comments);
+        add_row_updates();
     }
-    return null;
+   
+    IDOfRecord = `data-IDrecord=${objectChange.Id}`
+    
+    for (var i = 0; i < objectChange.TestsList.length; i++) {
+        $("#descTest").val(objectChange.TestsList[i].Description);
+        add_row_test();
+        if (objectChange.TestsList[i].ApprovedInitated)
+            document.getElementById("UserSign"+(i+1)).checked = true;
+        if (objectChange.TestsList[i].ApprovedProgrammer)
+            document.getElementById("ProgSign" + (i + 1)).checked = true;        
+    }
+
 }
 
 function AddChange() {
     ClearFields();
+    IDOfRecord = `data-IDrecord=${IdNext}`
     NewOrUpdate = "New";
     $("#editDiv").show();
 
@@ -248,7 +289,6 @@ function onSubmitFunc() {
 
 
 function Save() {
-    if (NewOrUpdate == "New") {
 
         //pick the table of objects affected
         var tableObjects = document.getElementById("data_table");
@@ -283,10 +323,17 @@ function Save() {
             }
         }
 
-
+    if (NewOrUpdate == "Update") {
+        IDcurrent = ChangeID;//comes from the element chosen
+        ajaxType = "PUT"
+    } 
+    else if (NewOrUpdate == "New") {
+        IDcurrent = IdNext;//new one
+        ajaxType="POST"
+    }
 
         var ChangeObj = {
-            Id: IdNext,
+            Id: IDcurrent,
             NameInitated: $("#Name").val(),
             Programmer: $("#NamePrgrammer").val(),
             ProgrammerNum: $("#EmpNum").val(),
@@ -296,16 +343,20 @@ function Save() {
             FinanceApproveNecessary: $("#automatic").is(':checked'),
             ObjectsList: arrObject,
             TestsList: arrTest
-        }
-        ajaxCall("POST", "../api/Changes", JSON.stringify(ChangeObj), postChangeSuccess, postChangeError);//insert change to db
     }
+
+    ajaxCall(ajaxType, "../api/Changes", JSON.stringify(ChangeObj), postChangeSuccess, postChangeError);//update records
+    
 }
 
 
 
 function postChangeSuccess(massege) {
     if (massege == "Success") {
-        swal("שינוי נוסף בהצלחה");
+        if (NewOrUpdate == "New")
+            swal("Change was added successfully!", "", "success");
+        else
+            swal("Change was updated successfully!", "", "success");
         ajaxCall("GET", "../api/Changes", "", successCBChange, error);
     }
     else {
@@ -331,6 +382,8 @@ function ClearFields() {
     $("#libary").val('');
     $("#subject").val('');
     $("#description").val('');
+    $("#data_table").val('');
+    $("#descTest").val('');
 }
 
 
@@ -396,7 +449,10 @@ function add_row_test() {
 
     var table = document.getElementById("tableTestingPlan");
     var table_len = (table.rows.length) - 1;
-    var row = table.insertRow(table_len).outerHTML = "<tr id='row" + table_len + "'><td id='No" + table_len + "' disabled>" + table_len + "</td><td id='descTest" + table_len + "'>" + descTest + "</td><td><input type='checkbox' id='UserSign" + table_len + "' class='center-block form-control' " + SignUser + " /></td></td > <td><input type='checkbox' id='ProgSign" + table_len + "' class='center-block form-control' " + SignDeveloper + " /></td> <td><input type='button' id='edit_button" + table_len + "' value='Edit' class='edit' onclick='edit_row(" + table_len + ")'> <input type='button' id='save_button" + table_len + "' value='Save' class='save' onclick='save_row(" + table_len + ")'> <input type='button' value='Delete' class='delete' onclick='delete_row(" + table_len + ")'></td></tr>";
+    if (NewOrUpdate == "New") {//disable checkbox of user sign because the programmer open the new change
+        Premission = 'onclick="return false"'
+    }
+    var row = table.insertRow(table_len).outerHTML = "<tr id='row" + table_len + "'" + IDOfRecord + " > <td id='No" + table_len + "' disabled>" + table_len + "</td> <td id='descTest" + table_len + "'>" + descTest + "</td> <td><input type='checkbox' id='UserSign" + table_len + "' class='center-block form-control' " + SignUser + Premission+"/></td></td > <td><input type='checkbox' id='ProgSign" + table_len + "' class='center-block form-control' " + SignDeveloper + " /></td> <td><input type='button' id='edit_button" + table_len + "' value='Edit' class='edit' onclick='edit_row(" + table_len + ")'> <input type='button' id='save_button" + table_len + "' value='Save' class='save' onclick='save_row(" + table_len + ")'> <input type='button' value='Delete' class='delete' onclick='delete_row(" + table_len + ")'></td></tr>";
 
     document.getElementById("No").value = table_len + 1;
     document.getElementById("descTest").value = "";
@@ -404,3 +460,7 @@ function add_row_test() {
     document.getElementById("SignDeveloper").checked = false;
 
 }
+
+//check if user can sign on the test
+
+

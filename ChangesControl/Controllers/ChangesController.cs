@@ -16,6 +16,7 @@ namespace ChangesControl.Controllers
     public class ChangesController : ApiController
     {
         User UserDetails = new User();
+        Changes changes = new Changes();
 
         [HttpPost]
         [Route("api/Changes/User")]
@@ -36,25 +37,36 @@ namespace ChangesControl.Controllers
             string[] id = idChange.Split('-');
             idChange = id[1];
             bool check =false;
-            Changes change = new Changes();
-            check=change.CheckifCanApprove(fullNameUser,userName,TypeApprove,idChange);
+            check=changes.CheckifCanApprove(fullNameUser,userName,TypeApprove,idChange);
             return check;
         }
 
-        Changes changes = new Changes();        
+        [HttpGet]
+        [Route("api/Changes/PermissionsUsers")]
+        public List<User> GetPermissionsUsers()
+        {
+            return UserDetails.GetPermissionsUsers();
+        }
+
+
         // GET api/values
         public DataTable Get()
-        {
-          
+        {         
             DataTable dataTable = new DataTable();
             dataTable=changes.GetFromDB();
             return dataTable;
         }
 
-        // GET api/values/5
-        public string Get(int id)
-        {
-            return "value";
+        /// <summary>
+        /// get the change details after click on edit/view
+        /// </summary>
+        [HttpGet]
+        [Route("api/Changes/getChange/{idChange}")]
+        public Changes GetChangeDetails(string idChange)
+        {     
+            Changes changeDetails= new Changes();
+            changeDetails.GetChangeDetails(idChange);
+            return changeDetails;
         }
 
         // POST api/values
@@ -75,8 +87,17 @@ namespace ChangesControl.Controllers
         }
 
         // PUT api/values/5
-        public void Put(int id, [FromBody]string value)
+        public string Put([FromBody]Changes changeToUpdate)
         {
+            try
+            {
+                changeToUpdate.UpdateChangeRecord();
+                return "Success";
+            }
+            catch (Exception e)
+            {
+                return e.Message;
+            }
         }
 
         // DELETE api/values/5

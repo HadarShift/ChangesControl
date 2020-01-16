@@ -13,6 +13,10 @@ namespace ChangesControl.Models
         public string Password { get; set; }
         public string FullName { get; set; }
         public bool IsValid { get; set; }
+        public bool PremissionEdit { get; set; }
+        public bool PremissionIT { get; set; }
+        public bool PremissionFinance { get; set; }
+
         public List<string> ListUsersNames { get; set; }//list of all users full names
         public User()
         {
@@ -52,6 +56,16 @@ namespace ChangesControl.Models
                 LogWaveClass.LogWave("IsValidUser -" + ex.Message);
             }
      
+
+        }
+
+        /// <summary>
+        /// get all Permissions of users 
+        /// </summary>
+        internal List<User> GetPermissionsUsers()
+        {
+            DBservices dBservices = new DBservices();
+            return dBservices.importDataChangesPremission();
 
         }
     }
