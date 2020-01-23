@@ -212,8 +212,13 @@
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
+    <Content Include="Pages\css\main.css" />
+    <Content Include="Pages\css\styles.css" />
+    <Content Include="Pages\css\util.css" />
     <Content Include="Pages\edit.html" />
     <Content Include="Pages\HtmlPage1.html" />
+    <Content Include="Pages\HtmlPage2.html" />
+    <Content Include="Pages\changesControlLogin.html" />
     <Content Include="Pages\splash.jpg" />
     <Content Include="Scripts\ajaxCalls.js" />
     <Content Include="Scripts\ajaxCallsStub.js" />
@@ -250,6 +255,7 @@
     <Content Include="Scripts\jquery-3.3.1.min.js" />
     <Content Include="Scripts\jquery-3.3.1.slim.js" />
     <Content Include="Scripts\jquery-3.3.1.slim.min.js" />
+    <Content Include="Scripts\login.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">

@@ -2,15 +2,16 @@
 Premission=''
 $(document).ready(function () {
     NewOrUpdate = '';//new record or old one
-    $("#uname").val("hshiftan");
-    $("#psw").val("Hs29572");
-    //check user authentication
-    $("#Login").submit(function () {
-        event.preventDefault();
-        $("body").css("cursor", "progress");
-        CheckUser();
-    })
+    //$("#uname").val("hshiftan");
+    //$("#psw").val("Hs29573");
+    ////check user authentication
+    //$("#Login").submit(function () {
+    //    event.preventDefault();
+    //    $("body").css("cursor", "progress");
+    //    CheckUser();
+    //})
     $("#bodyContainer").hide()
+    $("#headAbove").hide();
     $("#editDiv").hide();
     $("#ChangesForm").submit(function () {
         event.preventDefault();
@@ -37,26 +38,33 @@ function CheckUser() {
 function PermissionsUsers(data) {
     console.log(data);
     PermissionsUsersArr = data;
+    successValidationUser();//start the proccess of get the page
+
 }
 
 //return user details after validation
-function successValidationUser(data) {
-    $("body").css("cursor", "default");
-    User = data;//user details
-    console.log(data);
-    if (!User.IsValid) {//wrong login
-        Swal.fire({
-            icon: 'error',
-            title: 'שגיאה',
-            text: "username or password is incorrect"
-            //footer: '<a href>Why do I have this issue?</a>'
-        })
-    }
-    //good login
-    else {
+function successValidationUser() {
+    //$("body").css("cursor", "default");
+    //User = data;//user details
+    //console.log(data);
+    //if (!User.IsValid) {//wrong login
+    //    Swal.fire({
+    //        icon: 'error',
+    //        title: 'שגיאה',
+    //        text: "username or password is incorrect"
+    //        //footer: '<a href>Why do I have this issue?</a>'
+    //    })
+    //}
+    ////good login
+    //else {
+    //    window.location.href = "http://localhost:54539/Pages/HtmlPage1.html";
+    if (localStorage["User"]) {
+        User = JSON.parse(localStorage["User"])//get from local storage
         document.getElementById("nameUser").innerHTML = User.FullName;
+
         $("#Login").hide();
         $("#bodyContainer").show();
+        $("#headAbove").show();
         str = "";
         User.ListUsersNames.sort();
         for (var item of User.ListUsersNames) {
@@ -74,12 +82,13 @@ function successValidationUser(data) {
             else
                 PremissionEdit = false
         }
-          
+
 
         ajaxCall("GET", "../api/Changes", "", successCBChange, error);
     }
-
 }
+
+
 
 //After get changes details from db
 function successCBChange(Changes) {
