@@ -1,4 +1,5 @@
 ﻿var IDOfRecord = ''
+Premission = '';
 local = false;//change also in login.js
 $(document).ready(function () {
     NewOrUpdate = '';//new record or old one

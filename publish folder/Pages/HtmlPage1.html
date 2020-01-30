@@ -28,9 +28,8 @@
     
     <style>
         #newBTN {
-            left: 11%;
-            position: absolute;
-            background-color:orange
+            background-color: orange;
+            /*margin-left: 120px;*/
         }
 
         body {
@@ -79,16 +78,14 @@
 
         .atg {
             width: 20%;
-            left: 11%;
-            position: relative;
+            right: 10%;
+            position: absolute;
         }
 
         #headAbove h2 {
             position: absolute;
+            left: 45%;
             display: inline-flex;
-            right: 11%;
-            font-family: cursive;
-            font-size: large;
         }
 
         .container {
@@ -133,11 +130,7 @@
 
         .titles {
             font-weight: bold;
-            color: #7b3e3e;
-            left: 40%;
-            position: relative;
-            float: left;
-            font-family: cursive;
+            color: red
         }
 
         #bodyContainer h2 {
@@ -157,8 +150,8 @@
         }
 
         #pForm, #editDiv {
-            /*background-color: antiquewhite;*/
-            background-color: rgb(245, 245, 245); 
+            background-color: antiquewhite;
+
         }
 
         body {
@@ -593,10 +586,10 @@
 
 
 
+        <button type="button" class="btn btn-primary btn-lg" id="newBTN">Add New Change</button>
 
         <form id="pForm">
             <h1 class="titles">Changes List</h1>
-            <button type="button" class="btn btn-primary btn-lg" id="newBTN">Add New Change</button>
 
             <!---------------------------------------------------------------------------------------------------------->
             <!--table-->

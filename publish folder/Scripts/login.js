@@ -1,6 +1,6 @@
 ﻿var IDOfRecord = ''
 Premission = ''
-local = true;//change also in JavaScript.js
+local = false;//change also in JavaScript.js
 $(document).ready(function () {
     //$("#uname").val("hshiftan");
     //$("#psw").val("Hs29573");
